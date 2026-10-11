@@ -7,10 +7,12 @@ import { BenchmarksAndVideosSection } from './components/BenchmarksAndVideosSect
 import { GlossarySection } from './components/GlossarySection';
 import { ArchitectureDiagramSection } from './components/ArchitectureDiagramSection';
 import { PromptTemplatesSection } from './components/PromptTemplatesSection';
-import { Bot, ArrowRight, Shield, Layers, BookOpen, Sparkles, CheckCircle2, Workflow, Terminal } from 'lucide-react';
+import { PromptOptimizerSection } from './components/PromptOptimizerSection';
+import { AgentEvaluationDashboard } from './components/AgentEvaluationDashboard';
+import { Bot, ArrowRight, Shield, Layers, BookOpen, Sparkles, CheckCircle2, Workflow, Terminal, Wand2, BarChart3 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'architecture' | 'diagrams' | 'prompts' | 'frameworks' | 'security' | 'resources' | 'glossary'>('architecture');
+  const [activeTab, setActiveTab] = useState<'architecture' | 'diagrams' | 'prompts' | 'optimizer' | 'evaluation' | 'frameworks' | 'security' | 'resources' | 'glossary'>('architecture');
   const [agentType, setAgentType] = useState<'single' | 'multi'>('single');
 
   return (
@@ -50,7 +52,23 @@ export default function App() {
                 activeTab === 'prompts' ? 'text-stone-900 font-semibold' : ''
               }`}
             >
-              프롬프트 템플릿
+              프롬프트
+            </button>
+            <button
+              onClick={() => setActiveTab('optimizer')}
+              className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activeTab === 'optimizer' ? 'text-stone-900 font-semibold' : ''
+              }`}
+            >
+              개선기
+            </button>
+            <button
+              onClick={() => setActiveTab('evaluation')}
+              className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activeTab === 'evaluation' ? 'text-stone-900 font-semibold' : ''
+              }`}
+            >
+              대시보드
             </button>
             <button
               onClick={() => setActiveTab('frameworks')}
@@ -164,6 +182,26 @@ export default function App() {
             03. 실무 프롬프트 템플릿
           </button>
           <button
+            onClick={() => setActiveTab('optimizer')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'optimizer'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            04. 프롬프트 자동 개선기
+          </button>
+          <button
+            onClick={() => setActiveTab('evaluation')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'evaluation'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            05. 에이전트 성능 평가 대시보드
+          </button>
+          <button
             onClick={() => setActiveTab('frameworks')}
             className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
               activeTab === 'frameworks'
@@ -171,7 +209,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            04. 프레임워크 선정 & 5단계 로드맵
+            06. 프레임워크 선정 & 5단계 로드맵
           </button>
           <button
             onClick={() => setActiveTab('security')}
@@ -181,7 +219,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            05. 95% 실패 요인 & 보안 (HITL)
+            07. 95% 실패 요인 & 보안 (HITL)
           </button>
           <button
             onClick={() => setActiveTab('resources')}
@@ -191,7 +229,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            06. 벤치마크 & 실무 영상 허브 (20선)
+            08. 벤치마크 & 실무 영상 허브 (20선)
           </button>
           <button
             onClick={() => setActiveTab('glossary')}
@@ -201,7 +239,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            07. 에이전트 엔지니어링 용어 사전
+            09. 에이전트 엔지니어링 용어 사전
           </button>
         </div>
 
@@ -253,6 +291,36 @@ export default function App() {
               </div>
 
               <PromptTemplatesSection />
+            </div>
+          )}
+
+          {activeTab === 'optimizer' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  프롬프트 모호성 진단 및 자동 개선 제안기
+                </h2>
+                <p className="text-xs text-stone-600">
+                  작성 중인 시스템 프롬프트의 보안 결함, 모호성, 환각 위험도를 즉시 감사하고 엔터프라이즈급 불변 헌법으로 자동 보강합니다.
+                </p>
+              </div>
+
+              <PromptOptimizerSection />
+            </div>
+          )}
+
+          {activeTab === 'evaluation' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  가상 에이전트 성능 평가 및 관제 대시보드
+                </h2>
+                <p className="text-xs text-stone-600">
+                  단일 에이전트부터 계층적 멀티 에이전트까지 성공률, 응답 지연시간, 환각 발생률, 1천회 실행 비용 및 시나리오별 통과율을 비교 분석하세요.
+                </p>
+              </div>
+
+              <AgentEvaluationDashboard />
             </div>
           )}
 

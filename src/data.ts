@@ -1,4 +1,4 @@
-import { Framework, EnterprisePhase, VideoResource, FailureMode, SecurityLayer, BenchmarkItem, GlossaryTerm, PromptTemplate } from './types';
+import { Framework, EnterprisePhase, VideoResource, FailureMode, SecurityLayer, BenchmarkItem, GlossaryTerm, PromptTemplate, AgentMetricSimulation, SimulationBenchmarkRun } from './types';
 
 export const FRAMEWORKS_DATA: Framework[] = [
   {
@@ -832,5 +832,111 @@ Provide your revised JSON tool invocation or terminal fallback response now.`
 
 Customer Input:
 {{CURRENT_CONVERSATION}}`
+  }
+];
+
+export const AGENT_METRICS_DATA: AgentMetricSimulation[] = [
+  {
+    id: 'single-baseline',
+    name: '단일 기본 챗봇 (Single Zero-Shot Agent)',
+    architectureType: 'Single Agent',
+    modelEngine: 'Claude 3.5 Haiku / GPT-4o-mini',
+    successRate: 58.4,
+    avgLatencySeconds: 1.8,
+    hallucinationRate: 19.2,
+    tokenCostPer1kRuns: 1.45,
+    toolCallAccuracy: 71.0,
+    avgTurns: 1.2,
+    bestFitScenario: '정형화된 1문 1답 FAQ, 단순 텍스트 번역 및 단일 문서 요약',
+    operationalTradeoff: '초저비용 및 즉각적 응답 속도 반면, 다단계 추론이나 도구 실패 시 자가 회복 불가'
+  },
+  {
+    id: 'sequential-chain',
+    name: '선형 파이프라인 에이전트 (Sequential Chain)',
+    architectureType: 'Sequential Chain',
+    modelEngine: 'GPT-4o / Gemini 1.5 Pro',
+    successRate: 74.6,
+    avgLatencySeconds: 5.4,
+    hallucinationRate: 11.5,
+    tokenCostPer1kRuns: 4.80,
+    toolCallAccuracy: 84.2,
+    avgTurns: 3.1,
+    bestFitScenario: '검색 ➔ 요약 ➔ 포맷팅으로 이어지는 고정 규칙 기반 업무 자동화',
+    operationalTradeoff: '중간 단계 실패 시 파이프라인 전체가 중단되며 유연한 조건부 분기 처리에 한계'
+  },
+  {
+    id: 'self-reflect-react',
+    name: '자가 교정 ReAct 에이전트 (Self-Reflecting ReAct)',
+    architectureType: 'Self-Reflecting ReAct',
+    modelEngine: 'Claude 3.5 Sonnet / GPT-4o',
+    successRate: 88.2,
+    avgLatencySeconds: 12.8,
+    hallucinationRate: 4.1,
+    tokenCostPer1kRuns: 12.60,
+    toolCallAccuracy: 93.5,
+    avgTurns: 5.8,
+    bestFitScenario: '사내 DB/API 연동 질의응답, 실패 시 파라미터 재시도가 필요한 기술 지원',
+    operationalTradeoff: '자가 비평(Critic) 루프로 환각을 극적으로 낮추나 토큰 소모량과 지연시간이 중간 수준 증가'
+  },
+  {
+    id: 'hierarchical-multi',
+    name: '계층적 멀티 에이전트 시스템 (Hierarchical Multi-Agent)',
+    architectureType: 'Hierarchical Multi-Agent',
+    modelEngine: 'GPT-4o (Orchestrator) + Sonnet 3.5 (Specialists)',
+    successRate: 95.1,
+    avgLatencySeconds: 24.6,
+    hallucinationRate: 1.8,
+    tokenCostPer1kRuns: 28.90,
+    toolCallAccuracy: 97.4,
+    avgTurns: 11.4,
+    bestFitScenario: '복합 기업 리서치, 코드 리뷰 및 자동 패치, 법률/재무 다각도 크로스체크',
+    operationalTradeoff: '최고 수준의 과업 완수율과 무환각에 근접하나, 최고 수준의 비용 및 20초 이상의 지연 발생'
+  }
+];
+
+export const BENCHMARK_SCENARIOS_DATA: SimulationBenchmarkRun[] = [
+  {
+    scenarioId: 'sc-1',
+    scenarioName: '1. 단순 주문 배송 조회 (Single DB Lookup)',
+    difficulty: 'Low',
+    agentResults: [
+      { agentId: 'single-baseline', passed: true, latency: 1.5, tokensUsed: 420, hallucinationDetected: false, turnsTaken: 1 },
+      { agentId: 'sequential-chain', passed: true, latency: 3.2, tokensUsed: 950, hallucinationDetected: false, turnsTaken: 2 },
+      { agentId: 'self-reflect-react', passed: true, latency: 6.1, tokensUsed: 1850, hallucinationDetected: false, turnsTaken: 3 },
+      { agentId: 'hierarchical-multi', passed: true, latency: 14.8, tokensUsed: 4200, hallucinationDetected: false, turnsTaken: 6 }
+    ]
+  },
+  {
+    scenarioId: 'sc-2',
+    scenarioName: '2. 불완전 입력 고객 환불 승인 (Ambiguous Query + Verification)',
+    difficulty: 'Medium',
+    agentResults: [
+      { agentId: 'single-baseline', passed: false, latency: 2.1, tokensUsed: 580, hallucinationDetected: true, turnsTaken: 1 },
+      { agentId: 'sequential-chain', passed: true, latency: 5.6, tokensUsed: 1420, hallucinationDetected: false, turnsTaken: 3 },
+      { agentId: 'self-reflect-react', passed: true, latency: 11.4, tokensUsed: 3100, hallucinationDetected: false, turnsTaken: 5 },
+      { agentId: 'hierarchical-multi', passed: true, latency: 21.3, tokensUsed: 6900, hallucinationDetected: false, turnsTaken: 9 }
+    ]
+  },
+  {
+    scenarioId: 'sc-3',
+    scenarioName: '3. API 500 장애 시 우회 재시도 (Transient Fault Self-Healing)',
+    difficulty: 'High',
+    agentResults: [
+      { agentId: 'single-baseline', passed: false, latency: 1.9, tokensUsed: 510, hallucinationDetected: true, turnsTaken: 1 },
+      { agentId: 'sequential-chain', passed: false, latency: 6.2, tokensUsed: 1890, hallucinationDetected: false, turnsTaken: 2 },
+      { agentId: 'self-reflect-react', passed: true, latency: 14.2, tokensUsed: 4200, hallucinationDetected: false, turnsTaken: 6 },
+      { agentId: 'hierarchical-multi', passed: true, latency: 26.5, tokensUsed: 8900, hallucinationDetected: false, turnsTaken: 12 }
+    ]
+  },
+  {
+    scenarioId: 'sc-4',
+    scenarioName: '4. 복합 시장 리서치 & 출처 교차 검증 (Deep Multi-source Synthesis)',
+    difficulty: 'Extreme',
+    agentResults: [
+      { agentId: 'single-baseline', passed: false, latency: 2.8, tokensUsed: 1100, hallucinationDetected: true, turnsTaken: 1 },
+      { agentId: 'sequential-chain', passed: false, latency: 8.9, tokensUsed: 2900, hallucinationDetected: true, turnsTaken: 4 },
+      { agentId: 'self-reflect-react', passed: true, latency: 18.5, tokensUsed: 6100, hallucinationDetected: false, turnsTaken: 8 },
+      { agentId: 'hierarchical-multi', passed: true, latency: 32.1, tokensUsed: 14500, hallucinationDetected: false, turnsTaken: 15 }
+    ]
   }
 ];

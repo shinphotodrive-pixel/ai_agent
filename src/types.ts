@@ -97,3 +97,32 @@ export interface PromptTemplate {
   variables: string[];
   engineeringNotes: string;
 }
+
+export interface AgentMetricSimulation {
+  id: string;
+  name: string;
+  architectureType: 'Single Agent' | 'Sequential Chain' | 'Self-Reflecting ReAct' | 'Hierarchical Multi-Agent';
+  modelEngine: string;
+  successRate: number; // %
+  avgLatencySeconds: number; // sec
+  hallucinationRate: number; // %
+  tokenCostPer1kRuns: number; // USD
+  toolCallAccuracy: number; // %
+  avgTurns: number;
+  bestFitScenario: string;
+  operationalTradeoff: string;
+}
+
+export interface SimulationBenchmarkRun {
+  scenarioId: string;
+  scenarioName: string;
+  difficulty: 'Low' | 'Medium' | 'High' | 'Extreme';
+  agentResults: {
+    agentId: string;
+    passed: boolean;
+    latency: number;
+    tokensUsed: number;
+    hallucinationDetected: boolean;
+    turnsTaken: number;
+  }[];
+}
