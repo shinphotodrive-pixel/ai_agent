@@ -126,3 +126,77 @@ export interface SimulationBenchmarkRun {
     turnsTaken: number;
   }[];
 }
+
+export interface ModelPricingTier {
+  id: string;
+  name: string;
+  provider: string;
+  inputPerMillionUSD: number;
+  outputPerMillionUSD: number;
+  recommendedRole: string;
+}
+
+export interface CostCalculationResult {
+  monthlyRuns: number;
+  totalInputTokensPerRun: number;
+  totalOutputTokensPerRun: number;
+  monthlyCostUSD: number;
+  costPerTaskUSD: number;
+  annualCostUSD: number;
+  tokenBreakdown: {
+    systemPromptTokens: number;
+    historyTurnsTokens: number;
+    toolCallPayloadTokens: number;
+    reflectionLoopTokens: number;
+  };
+}
+
+export interface ReflectionStep {
+  stepIndex: number;
+  stage: 'Draft Generation' | 'Tool Execution & Error' | 'Critic Reflection' | 'Refined Output';
+  actor: 'Generator (Generator Agent)' | 'Environment / Sandbox' | 'Critic (Evaluator Agent)' | 'Self-Correction Agent';
+  thought?: string;
+  actionCode?: string;
+  observation?: string;
+  critique?: {
+    flawDetected: string;
+    rootCause: string;
+    recommendedFix: string;
+  };
+  revisedPayload?: string;
+}
+
+export interface ReflectionScenario {
+  id: string;
+  title: string;
+  category: 'Code Runtime Error' | 'Schema Validation' | 'Factual Hallucination' | 'Policy Violation';
+  userGoal: string;
+  errorType: string;
+  steps: ReflectionStep[];
+  engineeringInsight: string;
+}
+
+export interface ValidationIssue {
+  path: string;
+  errorType: 'MISSING_REQUIRED' | 'TYPE_MISMATCH' | 'RANGE_VIOLATION' | 'UNAUTHORIZED_TOOL' | 'JSON_SYNTAX_ERROR';
+  message: string;
+  expected: string;
+  received: string;
+}
+
+export interface SchemaValidationReport {
+  isValid: boolean;
+  toolName: string;
+  issues: ValidationIssue[];
+  repairedPayload?: string;
+  executionStatus: 'READY_TO_DISPATCH' | 'BLOCKED_BY_GUARDRAIL' | 'SYNTAX_REJECTED';
+}
+
+export interface ToolDefinitionPreset {
+  id: string;
+  toolName: string;
+  description: string;
+  schemaJson: string;
+  sampleValidPayload: string;
+  sampleInvalidPayload: string;
+}

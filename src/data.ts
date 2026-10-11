@@ -1,4 +1,4 @@
-import { Framework, EnterprisePhase, VideoResource, FailureMode, SecurityLayer, BenchmarkItem, GlossaryTerm, PromptTemplate, AgentMetricSimulation, SimulationBenchmarkRun } from './types';
+import { Framework, EnterprisePhase, VideoResource, FailureMode, SecurityLayer, BenchmarkItem, GlossaryTerm, PromptTemplate, AgentMetricSimulation, SimulationBenchmarkRun, ModelPricingTier, ReflectionScenario, ReflectionStep } from './types';
 
 export const FRAMEWORKS_DATA: Framework[] = [
   {
@@ -937,6 +937,213 @@ export const BENCHMARK_SCENARIOS_DATA: SimulationBenchmarkRun[] = [
       { agentId: 'sequential-chain', passed: false, latency: 8.9, tokensUsed: 2900, hallucinationDetected: true, turnsTaken: 4 },
       { agentId: 'self-reflect-react', passed: true, latency: 18.5, tokensUsed: 6100, hallucinationDetected: false, turnsTaken: 8 },
       { agentId: 'hierarchical-multi', passed: true, latency: 32.1, tokensUsed: 14500, hallucinationDetected: false, turnsTaken: 15 }
+    ]
+  }
+];
+
+export const MODEL_PRICING_DATA: ModelPricingTier[] = [
+  {
+    id: 'gpt-4o-mini',
+    name: 'GPT-4o mini',
+    provider: 'OpenAI',
+    inputPerMillionUSD: 0.15,
+    outputPerMillionUSD: 0.60,
+    recommendedRole: '고빈도 단순 질의응답, 1차 의도 분류(Triage), 가벼운 서브에이전트'
+  },
+  {
+    id: 'claude-3-5-haiku',
+    name: 'Claude 3.5 Haiku',
+    provider: 'Anthropic',
+    inputPerMillionUSD: 0.80,
+    outputPerMillionUSD: 4.00,
+    recommendedRole: '초저지연 함수 호출, 중간 데이터 파싱, 빠른 텍스트 요약'
+  },
+  {
+    id: 'gpt-4o',
+    name: 'GPT-4o (Omni)',
+    provider: 'OpenAI',
+    inputPerMillionUSD: 2.50,
+    outputPerMillionUSD: 10.00,
+    recommendedRole: '멀티모달 비전 분석, 복합 함수 조율, 오케스트레이터 중앙 두뇌'
+  },
+  {
+    id: 'claude-3-5-sonnet',
+    name: 'Claude 3.5 Sonnet',
+    provider: 'Anthropic',
+    inputPerMillionUSD: 3.00,
+    outputPerMillionUSD: 15.00,
+    recommendedRole: '코딩 자가 패치, 복합 도구 추론(SWE-bench SOTA), 비평(Critic)'
+  },
+  {
+    id: 'gemini-1-5-pro',
+    name: 'Gemini 1.5 Pro',
+    provider: 'Google',
+    inputPerMillionUSD: 1.25,
+    outputPerMillionUSD: 5.00,
+    recommendedRole: '초대용량 컨텍스트(2M 토큰) 문서 아카이브 분석, 오디오/비디오 탐색'
+  }
+];
+
+export const REFLECTION_SCENARIOS_DATA: ReflectionScenario[] = [
+  {
+    id: 'runtime-error-pandas',
+    title: '1. 파이썬 코드 실행 런타임 에러 자가 교정',
+    category: 'Code Runtime Error',
+    userGoal: 'Pandas로 고객 결제 CSV 데이터를 불러와 2025년 월별 총매출 집계 그래프 생성',
+    errorType: 'KeyError & Datetime Parsing Exception',
+    engineeringInsight: '생성자 에이전트(Coder)가 컬럼명을 임의로 추측했다가 에러 트레이스백을 받고, Critic이 df.columns를 먼저 확인하는 탐색적 조회를 지시하여 2회차에 완벽한 코드를 작성합니다.',
+    steps: [
+      {
+        stepIndex: 1,
+        stage: 'Draft Generation',
+        actor: 'Generator (Generator Agent)',
+        thought: '고객 결제 파일에서 날짜 컬럼을 기준으로 월별 집계를 진행하는 스크립트를 즉시 작성하자.',
+        actionCode: `import pandas as pd
+df = pd.read_csv('payments_2025.csv')
+df['month'] = pd.to_datetime(df['payment_date']).dt.to_period('M')
+monthly_summary = df.groupby('month')['amount'].sum()
+print(monthly_summary)`
+      },
+      {
+        stepIndex: 2,
+        stage: 'Tool Execution & Error',
+        actor: 'Environment / Sandbox',
+        observation: `Traceback (most recent call last):
+  File "script.py", line 3, in <module>
+    df['month'] = pd.to_datetime(df['payment_date']).dt.to_period('M')
+KeyError: "None of ['payment_date'] are in the columns. Available columns: ['txn_id', 'created_at_utc', 'price_cents', 'status']"`
+      },
+      {
+        stepIndex: 3,
+        stage: 'Critic Reflection',
+        actor: 'Critic (Evaluator Agent)',
+        critique: {
+          flawDetected: 'KeyError: payment_date 컬럼이 존재하지 않음',
+          rootCause: '실제 CSV 스키마를 확인하지 않고 표준 컬럼명을 임의로 가정함. 가격 또한 dollar amount가 아니라 price_cents(정수)로 저장되어 있음.',
+          recommendedFix: '1) payment_date 대신 created_at_utc 컬럼 파싱\n2) price_cents를 100으로 나누어 정규화된 달러 금액으로 계산\n3) status == "COMPLETED" 성공 결제 필터링 추가'
+        }
+      },
+      {
+        stepIndex: 4,
+        stage: 'Refined Output',
+        actor: 'Self-Correction Agent',
+        thought: 'Critic의 피드백을 반영하여 실제 컬럼(created_at_utc, price_cents)을 사용하고 센트 단위를 달러로 변환하며 완료된 결제만 필터링하도록 전면 수정한다.',
+        actionCode: `import pandas as pd
+df = pd.read_csv('payments_2025.csv')
+# 1. 완료된 결제만 필터링
+completed_df = df[df['status'] == 'COMPLETED'].copy()
+# 2. 올바른 날짜 컬럼 파싱
+completed_df['month'] = pd.to_datetime(completed_df['created_at_utc']).dt.to_period('M')
+# 3. 센트(cents)를 달러(USD)로 변환 후 집계
+completed_df['amount_usd'] = completed_df['price_cents'] / 100.0
+monthly_summary = completed_df.groupby('month')['amount_usd'].sum()
+print("2025년 월별 집계 성공:\n", monthly_summary)`
+      }
+    ]
+  },
+  {
+    id: 'sql-schema-validation',
+    title: '2. SQL 쿼리 도구 매개변수 유효성 위반 교정',
+    category: 'Schema Validation',
+    userGoal: 'VIP 고객 10명의 최근 구매 이력 및 누적 포인트 데이터베이스 조회',
+    errorType: 'Pydantic ValidationError & SQL Injection Pattern Blocked',
+    engineeringInsight: '가드레일 유효성 검사기에서 세미콜론이 포함된 원시 SQL 인젝션 패턴과 필수 정수형 limit 초과를 차단하자, 에이전트가 안전한 파라미터화된 쿼리 스키마로 스스로 다운그레이드합니다.',
+    steps: [
+      {
+        stepIndex: 1,
+        stage: 'Draft Generation',
+        actor: 'Generator (Generator Agent)',
+        thought: '사내 SQL 도구를 사용하여 직접 문자열 연결 쿼리를 보내자.',
+        actionCode: `{
+  "tool_name": "execute_raw_sql",
+  "arguments": {
+    "query": "SELECT * FROM users u JOIN orders o ON u.id = o.user_id WHERE u.tier = 'VIP' LIMIT 1000;"
+  }
+}`
+      },
+      {
+        stepIndex: 2,
+        stage: 'Tool Execution & Error',
+        actor: 'Environment / Sandbox',
+        observation: `ValidationError: execute_raw_sql is strictly forbidden for security reasons.
+Guardrail: Raw SQL blocked. Limit 1000 exceeds maximum safety limit (100).
+Allowed Tool: query_customer_tier(tier: str, limit: int <= 100, include_points: bool)`
+      },
+      {
+        stepIndex: 3,
+        stage: 'Critic Reflection',
+        actor: 'Critic (Evaluator Agent)',
+        critique: {
+          flawDetected: '허가되지 않은 임의 SQL 호출 및 안전 수량 초과',
+          rootCause: '에이전트가 최소 권한 원칙(Least Privilege) API를 무시하고 위험한 execute_raw_sql 호출을 시도함.',
+          recommendedFix: '보안 화이트리스트에 등록된 query_customer_tier 도구를 사용하고, limit을 요구 조건인 10으로 축소하며 include_points 플래그를 true로 지정.'
+        }
+      },
+      {
+        stepIndex: 4,
+        stage: 'Refined Output',
+        actor: 'Self-Correction Agent',
+        thought: '원시 SQL을 포기하고 보안 가드레일이 승인한 전용 함수 query_customer_tier로 스키마를 정정한다.',
+        actionCode: `{
+  "tool_name": "query_customer_tier",
+  "arguments": {
+    "tier": "VIP",
+    "limit": 10,
+    "include_points": true,
+    "sort_by": "last_purchase_date_desc"
+  }
+}`
+      }
+    ]
+  },
+  {
+    id: 'hallucination-grounding',
+    title: '3. 환각 발생 시 검색 재시도 및 팩트 앵커링',
+    category: 'Factual Hallucination',
+    userGoal: '사내 2026 복리후생 개정안에서 "치과 치료 지원 한도 및 청구 기한" 안내',
+    errorType: 'Hallucination & Lack of Source Citation',
+    engineeringInsight: '에이전트가 학습 데이터의 일반 상식으로 "연간 50만원"이라고 허위 답변하자, 내부 검수(Critic) 에이전트가 출처 부재를 지적하고 사내 복지 규정집 PDF를 검색하여 정확한 조항("연간 120만원, 발생일로부터 90일")을 도출합니다.',
+    steps: [
+      {
+        stepIndex: 1,
+        stage: 'Draft Generation',
+        actor: 'Generator (Generator Agent)',
+        thought: '치과 치료 지원은 통상 연간 50만원선이므로 빠르게 답변을 구성하자.',
+        actionCode: `[초안 답변]
+당사의 2026년 치과 치료 지원 한도는 연간 최대 500,000원이며, 치료 후 30일 이내에 인사팀으로 영수증을 제출하시면 됩니다.`
+      },
+      {
+        stepIndex: 2,
+        stage: 'Tool Execution & Error',
+        actor: 'Environment / Sandbox',
+        observation: `Automated RAG Evaluator (Faithfulness Check):
+Score: 0.12 / 1.0 (FAILED)
+Citation Check: No source document cited. The provided numbers (50만원, 30일) do not exist in 'welfare_policy_2026.pdf'.`
+      },
+      {
+        stepIndex: 3,
+        stage: 'Critic Reflection',
+        actor: 'Critic (Evaluator Agent)',
+        critique: {
+          flawDetected: '출처 없는 근거 날조 (Hallucination Detected)',
+          rootCause: '지식 베이스 검색(Search Tool)을 실행하지 않고 사전 가중치(Prior Weights)로 추측하여 답변함.',
+          recommendedFix: '1) search_kb("dental welfare subsidy policy 2026") 도구를 명시적으로 먼저 호출할 것\n2) 문서에 명시된 정확한 금액과 제출 기한을 원문 그대로 인용할 것'
+        }
+      },
+      {
+        stepIndex: 4,
+        stage: 'Refined Output',
+        actor: 'Self-Correction Agent',
+        thought: 'search_kb 도구를 호출하여 welfare_policy_2026.pdf 제14조 2항을 확인했다. 정확한 수치로 재작성한다.',
+        actionCode: `[검증 완료 최종 답변]
+사내 '2026 임직원 복리후생 규정집' 제14조(의료 지원) 제2항에 따른 공식 기준입니다:
+
+- **지원 한도**: 연간 최대 1,200,000원 (보철 및 교정 제외 실비 지원)
+- **청구 기한**: 진료일로부터 90일 이내 (사내 인트라넷 ERP '복지신청' 탭)
+- **제출 서류**: 진료비 세부내역서 및 병원 영수증 원본 스캔본
+
+※ 근거 출처: welfare_policy_2026.pdf (개정일자: 2026-01-02, 페이지 18)`
+      }
     ]
   }
 ];

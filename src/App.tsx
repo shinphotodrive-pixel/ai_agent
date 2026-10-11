@@ -9,10 +9,13 @@ import { ArchitectureDiagramSection } from './components/ArchitectureDiagramSect
 import { PromptTemplatesSection } from './components/PromptTemplatesSection';
 import { PromptOptimizerSection } from './components/PromptOptimizerSection';
 import { AgentEvaluationDashboard } from './components/AgentEvaluationDashboard';
-import { Bot, ArrowRight, Shield, Layers, BookOpen, Sparkles, CheckCircle2, Workflow, Terminal, Wand2, BarChart3 } from 'lucide-react';
+import { CostSimulatorSection } from './components/CostSimulatorSection';
+import { ReflectionSimulatorSection } from './components/ReflectionSimulatorSection';
+import { ToolValidatorSection } from './components/ToolValidatorSection';
+import { Bot, ArrowRight, Shield, Layers, BookOpen, Sparkles, CheckCircle2, Workflow, Terminal, Wand2, BarChart3, Calculator, RefreshCw, ShieldCheck } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'architecture' | 'diagrams' | 'prompts' | 'optimizer' | 'evaluation' | 'frameworks' | 'security' | 'resources' | 'glossary'>('architecture');
+  const [activeTab, setActiveTab] = useState<'architecture' | 'diagrams' | 'reflection' | 'validator' | 'prompts' | 'optimizer' | 'evaluation' | 'cost' | 'frameworks' | 'security' | 'resources' | 'glossary'>('architecture');
   const [agentType, setAgentType] = useState<'single' | 'multi'>('single');
 
   return (
@@ -29,7 +32,7 @@ export default function App() {
           </a>
 
           {/* Zone 2: Nav links, single-line */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-stone-600">
+          <nav className="hidden md:flex items-center gap-3.5 text-sm font-medium text-stone-600">
             <button
               onClick={() => setActiveTab('architecture')}
               className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
@@ -45,6 +48,22 @@ export default function App() {
               }`}
             >
               흐름도
+            </button>
+            <button
+              onClick={() => setActiveTab('reflection')}
+              className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activeTab === 'reflection' ? 'text-stone-900 font-semibold' : ''
+              }`}
+            >
+              자가 교정
+            </button>
+            <button
+              onClick={() => setActiveTab('validator')}
+              className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activeTab === 'validator' ? 'text-stone-900 font-semibold' : ''
+              }`}
+            >
+              도구 검증기
             </button>
             <button
               onClick={() => setActiveTab('prompts')}
@@ -69,6 +88,14 @@ export default function App() {
               }`}
             >
               대시보드
+            </button>
+            <button
+              onClick={() => setActiveTab('cost')}
+              className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activeTab === 'cost' ? 'text-stone-900 font-semibold' : ''
+              }`}
+            >
+              비용
             </button>
             <button
               onClick={() => setActiveTab('frameworks')}
@@ -172,6 +199,26 @@ export default function App() {
             02. 아키텍처 흐름도 (Mermaid)
           </button>
           <button
+            onClick={() => setActiveTab('reflection')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'reflection'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            03. 에이전트 자가 교정 (Reflection)
+          </button>
+          <button
+            onClick={() => setActiveTab('validator')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'validator'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            04. 도구 스키마 실시간 검증기
+          </button>
+          <button
             onClick={() => setActiveTab('prompts')}
             className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
               activeTab === 'prompts'
@@ -179,7 +226,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            03. 실무 프롬프트 템플릿
+            05. 실무 프롬프트 템플릿
           </button>
           <button
             onClick={() => setActiveTab('optimizer')}
@@ -189,7 +236,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            04. 프롬프트 자동 개선기
+            06. 프롬프트 자동 개선기
           </button>
           <button
             onClick={() => setActiveTab('evaluation')}
@@ -199,7 +246,17 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            05. 에이전트 성능 평가 대시보드
+            07. 에이전트 성능 평가 대시보드
+          </button>
+          <button
+            onClick={() => setActiveTab('cost')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'cost'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            08. 에이전트 토큰 & 비용 시뮬레이터
           </button>
           <button
             onClick={() => setActiveTab('frameworks')}
@@ -209,7 +266,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            06. 프레임워크 선정 & 5단계 로드맵
+            09. 프레임워크 선정 & 5단계 로드맵
           </button>
           <button
             onClick={() => setActiveTab('security')}
@@ -219,7 +276,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            07. 95% 실패 요인 & 보안 (HITL)
+            10. 95% 실패 요인 & 보안 (HITL)
           </button>
           <button
             onClick={() => setActiveTab('resources')}
@@ -229,7 +286,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            08. 벤치마크 & 실무 영상 허브 (20선)
+            11. 벤치마크 & 실무 영상 허브 (20선)
           </button>
           <button
             onClick={() => setActiveTab('glossary')}
@@ -239,7 +296,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            09. 에이전트 엔지니어링 용어 사전
+            12. 에이전트 엔지니어링 용어 사전
           </button>
         </div>
 
@@ -276,6 +333,36 @@ export default function App() {
               </div>
 
               <ArchitectureDiagramSection />
+            </div>
+          )}
+
+          {activeTab === 'reflection' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  에이전트 자가 교정 및 에러 복구 루프 (Reflection)
+                </h2>
+                <p className="text-xs text-stone-600">
+                  실행 런타임 에러, 스키마 유효성 실패, 출처 없는 환각 발생 시 비평자(Critic) 에이전트의 원인 분석과 자동 수정 패치 발행 과정을 시뮬레이션하세요.
+                </p>
+              </div>
+
+              <ReflectionSimulatorSection />
+            </div>
+          )}
+
+          {activeTab === 'validator' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  도구 호출 JSON 스키마 실시간 유효성 검증기
+                </h2>
+                <p className="text-xs text-stone-600">
+                  OpenAPI / Pydantic 표준 스키마를 기준으로 에이전트의 도구 이름, 필수 파라미터 누락, 타입 불일치, 허용 범위 초과를 실시간 인터셉트하고 자동 보정합니다.
+                </p>
+              </div>
+
+              <ToolValidatorSection />
             </div>
           )}
 
@@ -321,6 +408,21 @@ export default function App() {
               </div>
 
               <AgentEvaluationDashboard />
+            </div>
+          )}
+
+          {activeTab === 'cost' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  에이전트 토큰 소모량 및 API 운영 비용 시뮬레이터
+                </h2>
+                <p className="text-xs text-stone-600">
+                  아키텍처 패턴, 추론 턴 수, 모델 단가 및 호출 빈도를 조절하여 월간 예상 비용과 모델 라우팅 절감 효과를 산출하세요.
+                </p>
+              </div>
+
+              <CostSimulatorSection />
             </div>
           )}
 
