@@ -1,0 +1,6 @@
+{
+  "name": "AI 에이전트 구축 실무 포털",
+  "description": "생성형 AI에서 자율 에이전트 AI로의 전환을 위한 아키텍처 비교, 프레임워크 선정, 실패 요인 방어 및 실무 영상 가이드 포털",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
