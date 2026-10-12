@@ -12,10 +12,33 @@ import { AgentEvaluationDashboard } from './components/AgentEvaluationDashboard'
 import { CostSimulatorSection } from './components/CostSimulatorSection';
 import { ReflectionSimulatorSection } from './components/ReflectionSimulatorSection';
 import { ToolValidatorSection } from './components/ToolValidatorSection';
-import { Bot, ArrowRight, Shield, Layers, BookOpen, Sparkles, CheckCircle2, Workflow, Terminal, Wand2, BarChart3, Calculator, RefreshCw, ShieldCheck } from 'lucide-react';
+import { MemoryRetentionSection } from './components/MemoryRetentionSection';
+import { PromptABTestingSection } from './components/PromptABTestingSection';
+import { InjectionSimulatorSection } from './components/InjectionSimulatorSection';
+import { TopologyVisualizerSection } from './components/TopologyVisualizerSection';
+import { HitlGovernanceSimulator } from './components/HitlGovernanceSimulator';
+import { Bot, ArrowRight, Shield, Layers, BookOpen, Sparkles, CheckCircle2, Workflow, Terminal, Wand2, BarChart3, Calculator, RefreshCw, ShieldCheck, Network, ShieldAlert, Brain, Columns, UserCheck } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'architecture' | 'diagrams' | 'reflection' | 'validator' | 'prompts' | 'optimizer' | 'evaluation' | 'cost' | 'frameworks' | 'security' | 'resources' | 'glossary'>('architecture');
+  const [activeTab, setActiveTab] = useState<
+    | 'architecture'
+    | 'diagrams'
+    | 'topology'
+    | 'hitl'
+    | 'reflection'
+    | 'validator'
+    | 'injection'
+    | 'memory'
+    | 'ab-test'
+    | 'prompts'
+    | 'optimizer'
+    | 'evaluation'
+    | 'cost'
+    | 'frameworks'
+    | 'security'
+    | 'resources'
+    | 'glossary'
+  >('architecture');
   const [agentType, setAgentType] = useState<'single' | 'multi'>('single');
 
   return (
@@ -31,8 +54,8 @@ export default function App() {
             <span>에이전트 실무 포털</span>
           </a>
 
-          {/* Zone 2: Nav links, single-line */}
-          <nav className="hidden md:flex items-center gap-3.5 text-sm font-medium text-stone-600">
+          {/* Zone 2: Nav links, single-line (6 high-priority core links) */}
+          <nav className="hidden md:flex items-center gap-4 text-sm font-medium text-stone-600">
             <button
               onClick={() => setActiveTab('architecture')}
               className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
@@ -42,44 +65,36 @@ export default function App() {
               핵심 아키텍처
             </button>
             <button
-              onClick={() => setActiveTab('diagrams')}
+              onClick={() => setActiveTab('topology')}
               className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activeTab === 'diagrams' ? 'text-stone-900 font-semibold' : ''
+                activeTab === 'topology' ? 'text-stone-900 font-semibold' : ''
               }`}
             >
-              흐름도
+              토폴로지 구성기
             </button>
             <button
-              onClick={() => setActiveTab('reflection')}
+              onClick={() => setActiveTab('injection')}
               className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activeTab === 'reflection' ? 'text-stone-900 font-semibold' : ''
+                activeTab === 'injection' ? 'text-stone-900 font-semibold' : ''
               }`}
             >
-              자가 교정
+              인젝션 방어
             </button>
             <button
-              onClick={() => setActiveTab('validator')}
+              onClick={() => setActiveTab('memory')}
               className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activeTab === 'validator' ? 'text-stone-900 font-semibold' : ''
+                activeTab === 'memory' ? 'text-stone-900 font-semibold' : ''
               }`}
             >
-              도구 검증기
+              기억력 유지도
             </button>
             <button
-              onClick={() => setActiveTab('prompts')}
+              onClick={() => setActiveTab('ab-test')}
               className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activeTab === 'prompts' ? 'text-stone-900 font-semibold' : ''
+                activeTab === 'ab-test' ? 'text-stone-900 font-semibold' : ''
               }`}
             >
-              프롬프트
-            </button>
-            <button
-              onClick={() => setActiveTab('optimizer')}
-              className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activeTab === 'optimizer' ? 'text-stone-900 font-semibold' : ''
-              }`}
-            >
-              개선기
+              프롬프트 A/B
             </button>
             <button
               onClick={() => setActiveTab('evaluation')}
@@ -95,31 +110,7 @@ export default function App() {
                 activeTab === 'cost' ? 'text-stone-900 font-semibold' : ''
               }`}
             >
-              비용
-            </button>
-            <button
-              onClick={() => setActiveTab('frameworks')}
-              className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activeTab === 'frameworks' ? 'text-stone-900 font-semibold' : ''
-              }`}
-            >
-              프레임워크
-            </button>
-            <button
-              onClick={() => setActiveTab('security')}
-              className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activeTab === 'security' ? 'text-stone-900 font-semibold' : ''
-              }`}
-            >
-              실패 & 보안
-            </button>
-            <button
-              onClick={() => setActiveTab('resources')}
-              className={`hover:text-stone-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activeTab === 'resources' ? 'text-stone-900 font-semibold' : ''
-              }`}
-            >
-              영상 허브
+              비용 계산기
             </button>
             <button
               onClick={() => setActiveTab('glossary')}
@@ -186,7 +177,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            01. 핵심 아키텍처 및 트레이드오프
+            01. 핵심 아키텍처
           </button>
           <button
             onClick={() => setActiveTab('diagrams')}
@@ -196,7 +187,27 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            02. 아키텍처 흐름도 (Mermaid)
+            02. 흐름도 (Mermaid)
+          </button>
+          <button
+            onClick={() => setActiveTab('topology')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'topology'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            03. 멀티 에이전트 토폴로지
+          </button>
+          <button
+            onClick={() => setActiveTab('hitl')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'hitl'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            04. HITL 승인 게이트
           </button>
           <button
             onClick={() => setActiveTab('reflection')}
@@ -206,7 +217,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            03. 에이전트 자가 교정 (Reflection)
+            05. 자가 교정 (Reflection)
           </button>
           <button
             onClick={() => setActiveTab('validator')}
@@ -216,7 +227,37 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            04. 도구 스키마 실시간 검증기
+            06. 도구 스키마 검증기
+          </button>
+          <button
+            onClick={() => setActiveTab('injection')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'injection'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            07. 인젝션 시뮬레이터
+          </button>
+          <button
+            onClick={() => setActiveTab('memory')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'memory'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            08. 기억력 유지도 측정기
+          </button>
+          <button
+            onClick={() => setActiveTab('ab-test')}
+            className={`px-4 py-2 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'ab-test'
+                ? 'border-stone-900 text-stone-900 font-bold'
+                : 'border-transparent text-stone-500 hover:text-stone-900'
+            }`}
+          >
+            09. 프롬프트 A/B 테스트
           </button>
           <button
             onClick={() => setActiveTab('prompts')}
@@ -226,7 +267,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            05. 실무 프롬프트 템플릿
+            10. 실무 프롬프트 템플릿
           </button>
           <button
             onClick={() => setActiveTab('optimizer')}
@@ -236,7 +277,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            06. 프롬프트 자동 개선기
+            11. 프롬프트 자동 개선기
           </button>
           <button
             onClick={() => setActiveTab('evaluation')}
@@ -246,7 +287,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            07. 에이전트 성능 평가 대시보드
+            12. 성능 평가 대시보드
           </button>
           <button
             onClick={() => setActiveTab('cost')}
@@ -256,7 +297,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            08. 에이전트 토큰 & 비용 시뮬레이터
+            13. 토큰 & 비용 시뮬레이터
           </button>
           <button
             onClick={() => setActiveTab('frameworks')}
@@ -266,7 +307,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            09. 프레임워크 선정 & 5단계 로드맵
+            14. 프레임워크 & 로드맵
           </button>
           <button
             onClick={() => setActiveTab('security')}
@@ -276,7 +317,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            10. 95% 실패 요인 & 보안 (HITL)
+            15. 실패 요인 & 보안 (HITL)
           </button>
           <button
             onClick={() => setActiveTab('resources')}
@@ -286,7 +327,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            11. 벤치마크 & 실무 영상 허브 (20선)
+            16. 벤치마크 & 실무 영상
           </button>
           <button
             onClick={() => setActiveTab('glossary')}
@@ -296,7 +337,7 @@ export default function App() {
                 : 'border-transparent text-stone-500 hover:text-stone-900'
             }`}
           >
-            12. 에이전트 엔지니어링 용어 사전
+            17. 엔지니어링 용어 사전
           </button>
         </div>
 
@@ -336,6 +377,36 @@ export default function App() {
             </div>
           )}
 
+          {activeTab === 'topology' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  멀티 에이전트 위계 토폴로지 시각화 및 구성기
+                </h2>
+                <p className="text-xs text-stone-600">
+                  오케스트레이터, 특화 워커, 비평가 및 HITL 휴먼 게이트 간의 위계적 통신 구조와 데이터 흐름 연결선을 시각적으로 점검하고 노드를 동적 구성하세요.
+                </p>
+              </div>
+
+              <TopologyVisualizerSection />
+            </div>
+          )}
+
+          {activeTab === 'hitl' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  HITL 거버넌스 승인 시뮬레이터 (Human-in-the-Loop Approval Gate)
+                </h2>
+                <p className="text-xs text-stone-600">
+                  송금 금액, 위험 점수, 제한 도구 블랙리스트 등 커스텀 임계값을 설정하고, 에이전트가 위험 과업 실행 직전 일시정지(State Freeze)되어 관리자 승인을 기다리는 거버넌스 루프를 테스트하세요.
+                </p>
+              </div>
+
+              <HitlGovernanceSimulator />
+            </div>
+          )}
+
           {activeTab === 'reflection' && (
             <div className="space-y-12">
               <div className="space-y-2">
@@ -363,6 +434,51 @@ export default function App() {
               </div>
 
               <ToolValidatorSection />
+            </div>
+          )}
+
+          {activeTab === 'injection' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  에이전트 프롬프트 인젝션 모의 공격 및 방어 시뮬레이터
+                </h2>
+                <p className="text-xs text-stone-600">
+                  직접 탈옥(DAN), 간접 비신뢰 컨텍스트 오염, 역할극 탈취 공격에 대해 3단계 보안 가드레일 계층의 차단 여부와 실시간 위협 감사 로그(Threat Log)를 검증하세요.
+                </p>
+              </div>
+
+              <InjectionSimulatorSection />
+            </div>
+          )}
+
+          {activeTab === 'memory' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  초장문 컨텍스트 지시 기억력 유지도(Memory Retention) 측정기
+                </h2>
+                <p className="text-xs text-stone-600">
+                  Needle in a Haystack 실험 기법을 바탕으로 토큰 깊이(8k~128k), 바늘 위치(Lost in the Middle), 압축 요약 전략에 따른 에이전트의 지시사항 인출 성공률을 시뮬레이션합니다.
+                </p>
+              </div>
+
+              <MemoryRetentionSection />
+            </div>
+          )}
+
+          {activeTab === 'ab-test' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-stone-900">
+                  프롬프트 성능 및 토큰 효율성 A/B 벤치마크 테스트
+                </h2>
+                <p className="text-xs text-stone-600">
+                  동일한 에이전트 과업에 대해 두 프롬프트의 지침 정밀도, 성공률, 토큰 소모량, 응답 지연시간(Latency) 및 단가 효율성을 나란히 비교 분석합니다.
+                </p>
+              </div>
+
+              <PromptABTestingSection />
             </div>
           )}
 

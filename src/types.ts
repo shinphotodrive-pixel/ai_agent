@@ -200,3 +200,120 @@ export interface ToolDefinitionPreset {
   sampleValidPayload: string;
   sampleInvalidPayload: string;
 }
+
+// 1. Memory Retention Types
+export interface MemoryRetentionTestConfig {
+  contextDepthTokens: number; // 2k, 8k, 32k, 64k, 128k
+  needlePlacement: 'beginning' | 'middle_25' | 'middle_50' | 'middle_75' | 'end';
+  compactionStrategy: 'Raw Full Context' | 'Lossy Rolling Summary' | 'Hierarchical RAG Anchor';
+}
+
+export interface MemoryRetentionResult {
+  score: number; // 0-100%
+  lostInTheMiddleDegree: number; // %
+  recalledKeyDetails: string[];
+  forgottenConstraints: string[];
+  status: 'PERFECT_RECALL' | 'PARTIAL_ATTENUATION' | 'CRITICAL_ROT';
+}
+
+// 2. Prompt AB Testing Types
+export interface PromptABTestResult {
+  variantA: {
+    name: string;
+    prompt: string;
+    successRate: number;
+    tokensTotal: number;
+    latencySec: number;
+    estimatedCostUSD: number;
+    sampleOutput: string;
+    strengths: string[];
+    weaknesses: string[];
+  };
+  variantB: {
+    name: string;
+    prompt: string;
+    successRate: number;
+    tokensTotal: number;
+    latencySec: number;
+    estimatedCostUSD: number;
+    sampleOutput: string;
+    strengths: string[];
+    weaknesses: string[];
+  };
+  winner: 'A' | 'B' | 'TIE';
+  efficiencyDeltaPercent: number;
+  recommendation: string;
+}
+
+// 3. Agent Injection Simulator Types
+export interface InjectionAttempt {
+  id: string;
+  category: 'Direct Jailbreak' | 'Indirect Context Poisoning' | 'Roleplay Persona Hijack' | 'Encoded Cipher Exploit';
+  payload: string;
+  severity: 'Critical' | 'High' | 'Medium';
+  defenseBlocked: boolean;
+  agentResponse: string;
+  guardrailLayerTriggered?: string;
+  threatLog: string[];
+}
+
+// 4. Topology Visualizer Types
+export interface AgentNode {
+  id: string;
+  name: string;
+  role: 'Orchestrator' | 'Worker' | 'Critic' | 'Tool Gateway' | 'Human Gate';
+  model: string;
+  description: string;
+  x: number;
+  y: number;
+}
+
+export interface AgentEdge {
+  id: string;
+  source: string;
+  target: string;
+  channelType: 'Delegation' | 'Data Stream' | 'Critique Feedback' | 'Approval Webhook';
+  label: string;
+}
+
+// 5. HITL Governance Simulator Types
+export interface HitlGovernanceThresholds {
+  dollarAmountLimit: number; // e.g. $1,000
+  riskScoreLimit: number; // e.g. 65 / 100
+  restrictedActions: string[];
+  requireDualApproval: boolean;
+  notificationChannel: 'Slack Interactive Webhook' | 'Admin Security Portal' | 'Email Escalate';
+}
+
+export interface HitlScenario {
+  id: string;
+  title: string;
+  description: string;
+  category: 'Finance' | 'Database' | 'Infrastructure' | 'Customer PII';
+  proposedAction: {
+    toolName: string;
+    dollarAmount: number;
+    riskScore: number;
+    targetResource: string;
+    argumentsPayload: Record<string, any>;
+    explanation: string;
+  };
+}
+
+export type HitlExecutionStatus =
+  | 'IDLE'
+  | 'ANALYZING'
+  | 'EVALUATING_RULES'
+  | 'PAUSED_AWAITING_APPROVAL'
+  | 'APPROVED_RESUMING'
+  | 'REJECTED_ROLLEDBACK'
+  | 'AUTO_EXECUTED';
+
+export interface HitlAuditEntry {
+  id: string;
+  timestamp: string;
+  type: 'INFO' | 'RULE_EVAL' | 'PAUSE_FREEZE' | 'USER_INTERVENTION' | 'EXECUTE_SUCCESS' | 'SAFE_ROLLBACK';
+  message: string;
+  operator?: string;
+  badge?: string;
+}
